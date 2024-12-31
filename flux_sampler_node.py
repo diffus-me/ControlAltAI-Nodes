@@ -1,6 +1,7 @@
 import comfy.samplers
 import torch
 import comfy.sample
+import execution_context
 import latent_preview
 
 FLUX_SAMPLER_NAMES = [
@@ -23,6 +24,9 @@ class FluxSampler:
                 "steps": ("INT", {"default": 30, "min": 1, "max": 10000}),
                 "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
                 "noise_seed": ("INT", {"default": 143220275975594, "min": 0, "max": 0xffffffffffffffff}),
+            },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT",
             }
         }
 
@@ -31,7 +35,7 @@ class FluxSampler:
     FUNCTION = "sample"
     CATEGORY = "ControlAltAI Nodes/Flux"
 
-    def sample(self, model, conditioning, latent_image, sampler_name, scheduler, steps, denoise, noise_seed):
+    def sample(self, model, conditioning, latent_image, sampler_name, scheduler, steps, denoise, noise_seed, context: execution_context.ExecutionContext):
         device = comfy.model_management.get_torch_device()
         sampler = comfy.samplers.KSampler(model, steps=steps, device=device, sampler=sampler_name, scheduler=scheduler, denoise=denoise)
 
@@ -46,7 +50,7 @@ class FluxSampler:
         positive = conditioning
         negative = []  # Empty list for negative conditioning
 
-        callback = latent_preview.prepare_callback(model, steps)
+        callback = latent_preview.prepare_callback(context, model, steps)
         disable_pbar = not comfy.utils.PROGRESS_BAR_ENABLED
 
         samples = sampler.sample(noise, positive, negative, cfg=1.0, latent_image=latent_image,
