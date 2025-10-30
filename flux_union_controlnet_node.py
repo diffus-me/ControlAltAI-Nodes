@@ -5,6 +5,7 @@ import folder_paths
 class FluxUnionControlNetApply:
     # Correct UNION_CONTROLNET_TYPES mapping
     UNION_CONTROLNET_TYPES = {
+        "none": -1,
         "canny": 0,
         "tile": 1,
         "depth": 2,
@@ -49,7 +50,7 @@ class FluxUnionControlNetApply:
     CATEGORY = "ControlAltAI Nodes/Flux"
 
     def apply_flux_union_controlnet(self, conditioning, control_net, image, union_controlnet_type, strength, start_percent, end_percent, vae):
-        if strength == 0:
+        if strength == 0 or not control_net or union_controlnet_type == "none":
             return (conditioning, vae)
 
         # Map the 'union_controlnet_type' to 'control_type'
