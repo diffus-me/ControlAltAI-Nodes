@@ -1,4 +1,4 @@
-import { app } from "/scripts/app.js";
+import { app } from "../../../scripts/app.js";
 
 // Register the extension for IntegerSettingsAdvanced node
 app.registerExtension({
